@@ -1,4 +1,4 @@
-name: Gofile Mirror Bot
+name: Gofile Mirror Bot (Enhanced)
 
 on:
   workflow_dispatch:
@@ -20,11 +20,18 @@ on:
           - 'store5'
           - 'store6'
           - 'store7'
+          - 'store8'
         default: 'auto (Singapore priority)'
+      keep_local_file:
+        description: 'Keep file after upload (for debugging)'
+        required: false
+        type: boolean
+        default: false
 
 jobs:
   mirror:
     runs-on: ubuntu-latest
+    timeout-minutes: 360  # 6 hours max for very large files
     
     steps:
     - name: 🔄 Checkout Repository
@@ -43,6 +50,7 @@ jobs:
       env:
         DOWNLOAD_URL: ${{ inputs.download_url }}
         GOFILE_SERVER: ${{ inputs.gofile_server }}
+        KEEP_LOCAL_FILE: ${{ inputs.keep_local_file }}
       run: |
         python gofile_bot.py
     
@@ -55,3 +63,13 @@ jobs:
         else
           echo "❌ No result file found"
         fi
+    
+    - name: 📁 Upload Error Logs (if any)
+      if: failure()
+      uses: actions/upload-artifact@v4
+      with:
+        name: error-logs
+        path: |
+          gofile_error_response.txt
+          gofile_result.txt
+        if-no-files-found: ignore
