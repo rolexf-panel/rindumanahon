@@ -1,4 +1,4 @@
-name: Gofile Mirror Bot (Enhanced)
+name: Gofile Mirror Bot (Smart)
 
 on:
   workflow_dispatch:
@@ -8,11 +8,11 @@ on:
         required: true
         type: string
       gofile_server:
-        description: 'Gofile server (kosongkan untuk auto/Singapore)'
+        description: 'Gofile server selection'
         required: false
         type: choice
         options:
-          - 'auto (Singapore priority)'
+          - 'fastest (Auto-detect)'
           - 'store1'
           - 'store2'
           - 'store3'
@@ -21,7 +21,7 @@ on:
           - 'store6'
           - 'store7'
           - 'store8'
-        default: 'auto (Singapore priority)'
+        default: 'fastest (Auto-detect)'
       keep_local_file:
         description: 'Keep file after upload (for debugging)'
         required: false
@@ -31,7 +31,7 @@ on:
 jobs:
   mirror:
     runs-on: ubuntu-latest
-    timeout-minutes: 360  # 6 hours max for very large files
+    timeout-minutes: 360  # 6 hours for very large files
     
     steps:
     - name: 🔄 Checkout Repository
