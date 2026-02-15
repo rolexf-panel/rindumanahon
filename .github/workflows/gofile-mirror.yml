@@ -1,0 +1,57 @@
+name: Gofile Mirror Bot
+
+on:
+  workflow_dispatch:
+    inputs:
+      download_url:
+        description: 'URL file yang akan di-download'
+        required: true
+        type: string
+      gofile_server:
+        description: 'Gofile server (kosongkan untuk auto/Singapore)'
+        required: false
+        type: choice
+        options:
+          - 'auto (Singapore priority)'
+          - 'store1'
+          - 'store2'
+          - 'store3'
+          - 'store4'
+          - 'store5'
+          - 'store6'
+          - 'store7'
+        default: 'auto (Singapore priority)'
+
+jobs:
+  mirror:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: 🔄 Checkout Repository
+      uses: actions/checkout@v4
+    
+    - name: 🐍 Setup Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.11'
+    
+    - name: 📦 Install Dependencies
+      run: |
+        pip install requests tqdm
+    
+    - name: 📥 Download and Upload to Gofile
+      env:
+        DOWNLOAD_URL: ${{ inputs.download_url }}
+        GOFILE_SERVER: ${{ inputs.gofile_server }}
+      run: |
+        python gofile_bot.py
+    
+    - name: 📊 Display Results
+      if: always()
+      run: |
+        if [ -f gofile_result.txt ]; then
+          echo "=== UPLOAD RESULT ==="
+          cat gofile_result.txt
+        else
+          echo "❌ No result file found"
+        fi
